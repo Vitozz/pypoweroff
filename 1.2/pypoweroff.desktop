@@ -1,0 +1,14 @@
+
+[Desktop Entry]
+Encoding=UTF-8
+Icon=/usr/share/pypoweroff/images/poweroff.png
+Name=pyPowerOff
+Comment= The program for the planned shutdown of computer
+Exec=pypoff
+Terminal=false
+Type=Application
+Categories=Application;Utility;
+StartupNotify=false
+
+Comment[ru]=Программа запланированного выключения компьютера
+Name[ru]=Выключалка

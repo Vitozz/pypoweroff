@@ -1,0 +1,35 @@
+[Main]
+title = Power Off Tool
+timerid1 = Time to shutdown (min)
+timerid2 = Shutdown in (hour:min)
+timespin = Time to shutdown/reboot
+label1 = Hours
+label3 = Minutes
+rebootlabel = Reboot
+reboothint = Reboot system
+shutdownlabel = Shutdown
+shutdownhint = Shutdown system
+poffbutton = Shutdown/Reboot
+cantitle = Operation cancelled
+tmpsec = Time to shutdown
+author = Vitaly Tonkacheyev
+comments = The program for the planned shutdown of the computer for Linux and Windows
+website = Program Website
+
+[Menu]
+fileitem = File
+settingsitem = Options
+helpitem = Help
+
+[Dialog]
+exitlabel = Do you really want to quit this program?
+attentionp1 = Do you really want to
+attentionp2 = your computer after
+typestringsh = shutdown
+typestringrb = reboot
+
+[Tray]
+restorehide = Hide
+restore = Restore
+tooltip = Power Off Tool
+

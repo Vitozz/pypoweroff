@@ -1,0 +1,3 @@
+#!/bin/sh
+gnomesu 'python /usr/share/pypoweroff/execute.py'
+

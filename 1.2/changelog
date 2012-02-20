@@ -1,0 +1,39 @@
+pypoweroff (1.2.2-3) unstable; urgency=low
+
+  * Fixed localization
+  * Now program uses gksu to get root privilegies
+
+ -- Vitaly Tonkacheyev <thetvg@gmail.com>  Thu, 03 Sep 2010 11:20:00 +0200
+
+pypoweroff (1.2.2-2) unstable; urgency=low
+
+  * Fixed time count bug
+
+ -- Vitaly Tonkacheyev <thetvg@gmail.com>  Thu, 03 Sep 2010 11:20:00 +0200
+
+pypoweroff (1.2.1-2) unstable; urgency=low
+
+  * Fixed bug with exit program on shutdown
+
+ -- Vitaly Tonkacheyev <thetvg@gmail.com>  Thu, 02 Sep 2010 10:50:00 +0200
+
+pypoweroff (1.2-2) unstable; urgency=low
+
+  * Alot of bugs fixed
+  * Added minimize to tray on Close and on Minimize button pressed
+
+ -- Vitaly Tonkacheyev <thetvg@gmail.com>  Thu, 28 May 2010 16:35:20 +0200
+ 
+pypoweroff (1.2-1) unstable; urgency=low
+
+  * interface now written on GTK
+
+ -- Vitaly Tonkacheyev <thetvg@gmail.com>  Thu, 27 May 2010 13:20:16 +0200
+ 
+pypoweroff (1.1-1) unstable; urgency=low
+
+  * Initial release
+  * added possibility to switch off the system at a given time
+  * added possibility to change the language on the fly
+
+ -- Vitaly Tonkacheyev <thetvg@gmail.com>  Wed, 20 Jan 2010 21:51:16 +0200
