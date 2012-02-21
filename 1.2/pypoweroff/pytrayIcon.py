@@ -25,7 +25,7 @@ class StatusIcc:
         self.parent.OnHide()
 
     def onQuit(self, widget, data=None):
-        print "Saving settings..."
+        print ("Saving settings...")
         self.parent.OnExit(widget)
 
     def onAbort(self, widget, data=None):
@@ -68,7 +68,7 @@ class StatusIcc:
         if self.parent.systype == "windows":
             self.staticon.set_from_file("images\\poweroff.ico")
         else:
-            self.staticon.set_from_file("/usr/share/pypoweroff/images/tb_icon.png")
+            self.staticon.set_from_file(self.parent.loader.get("pypoweroff", "images/tb_icon.png"))
         self.status_tooltip = self.parent.language.tray_dic.get('tooltip')
         self.staticon.set_tooltip(self.status_tooltip)
         self.staticon.connect('activate', self.onLClick)

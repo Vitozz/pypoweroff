@@ -1,19 +1,24 @@
 #-*- coding: utf-8 -*-
 
-import os, sys, threading
+import os, threading
 import pygtk
 pygtk.require('2.0')
 import gtk
 import gtk.glade
 import gobject
 import time, string
-import signal
-from options import OptWork
-from pytrayIcon import StatusIcc
-from pylocale import MyLocale
+from .reswork import loadResFile
+from .options import OptWork
+from .pytrayIcon import StatusIcc
+from .pylocale import MyLocale
+
+if str(os.sys.platform) != "win32":
+    from .linux_shutdown import Shutdowner
 
 class mainFrame():
     def __init__(self):
+        self.__project = "pypoweroff"
+        self.loader = loadResFile()
         self.options = OptWork()
         self.language = MyLocale()
         self.time = 0
@@ -33,7 +38,7 @@ class mainFrame():
         if self.systype == "windows":
             self.gladefile = 'glades\\powoff.glade'
         else:
-            self.gladefile = '/usr/share/pypoweroff/glades/powoff.glade'
+            self.gladefile = self.loader.get(self.__project, "glades/powoff.glade")
         self.widgetTree = gtk.glade.XML(self.gladefile)
         dic = {"on_timespin_value_changed": self.ChangeTime, "on_reboot_toggled": self.OnShutdown,
                  "on_shutdown_toggled": self.OnShutdown, "on_timer_id1_toggled": self.SetTimerType,
@@ -205,7 +210,7 @@ class mainFrame():
                 self.time = self.timespin.get_value()*60
         label1 =  self.language.dialog_dic.get('attentionp1') + " "+self.type_string+" "+  self.language.dialog_dic.get('attentionp2') 
         label2 = self.convertTime(self.time)
-        print self.time
+        print (self.time)
         self.RunDialog(label1, label2, 'onRun')
 
     def OnCancel(self, widget):
@@ -326,14 +331,14 @@ class mainFrame():
         if self.systype == "windows":
             about.set_logo(gtk.gdk.pixbuf_new_from_file("images/poweroff.png"))
         else:
-            about.set_logo(gtk.gdk.pixbuf_new_from_file("/usr/share/pypoweroff/images/poweroff.png"))
+            about.set_logo(gtk.gdk.pixbuf_new_from_file(self.loader.get(self.__project, "images/poweroff.png")))
         about.run()
         about.destroy()
 #
 #==Other functions==
 #
     def GetSysType(self):
-        if str(sys.platform) == "win32":
+        if str(os.sys.platform) == "win32":
             output = "windows"
         else:
             output = "linux"
@@ -347,15 +352,21 @@ class mainFrame():
                 command =  "shutdown -s"
         else:
             if self.type == 0:
-                command =  "shutdown -r now"
+                command =  "reboot"
             elif self.type == 1:
-                command =  "shutdown -P now"
+                command =  "shutdown"
         return command
 
     def MakeAction(self, command):
-        os.system(command)
         if self.systype == 'windows':
-            gtk.main_quit()
+            os.system(command)
+            Gtk.main_quit()
+        else:
+            shutdownder = Shutdowner()
+            if command == "reboot":
+                shutdownder.Reboot()
+            elif command == "shutdown":
+                shutdownder.Shutdown()
 
     def Start(self, command_line):
         if self.systype != 'windows':
@@ -371,7 +382,7 @@ class mainFrame():
         if self.runed:
             self.OnTimer('Stop')
         else:
-            print "Shutdown timer not runned"
+            print ("Shutdown timer not runned")
 #
 #==Work with main window==
 #
@@ -384,7 +395,7 @@ class mainFrame():
         return True
 
     def OnHide(self):
-            print self.window.get_property('visible')
+            print (self.window.get_property('visible'))
             if self.window.get_property('visible'):
                 self.trayicon.restoreItem.get_children()[0].set_label(self.language.tray_dic.get('restore'))
                 self.window.hide()

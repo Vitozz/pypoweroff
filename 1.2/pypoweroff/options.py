@@ -8,19 +8,15 @@ class OptWork:
         self.settings = {'timeout': None, 'typeoff': None, 'pofWay': None,'htime': None, 'mtime': None, 'lang_id': None}
         self.CP = ConfigParser()
         if str(os.sys.platform) != 'win32':
-            self.cfgpath = os.environ["HOME"] + "/.pypoweroff/config.cfg"
+            self.cfgpath = os.environ["HOME"] + "/.config/pypoweroff/config.cfg"
             if not os.path.exists(self.cfgpath):
-                tmpath = os.environ["HOME"] + "/.pypoweroff"
-                os.mkdir(tmpath, 0775)
-                f = open(self.cfgpath, "wb")
-                f.write("[Main]\npofway = 1\nhtime = 0\ntimeout = 0\nmtime = 0\ntypeoff = 0\n[Language]\nid = 0\n")
-                f.close()
+                tmpath = os.environ["HOME"] + "/.config/pypoweroff"
+                os.mkdir(tmpath, 0o775)
+                self.WriteDefaultConfig(self.cfgpath)
         else:
             self.cfgpath = "config.cfg"
             if not os.path.exists(self.cfgpath):
-                f = open(self.cfgpath, "wb")
-                f.write("[Main]\npofway = 1\nhtime = 0\ntimeout = 0\nmtime = 0\ntypeoff = 0\n[Language]\nid = 0\n")
-                f.close()
+                self.WriteDefaultConfig(self.cfgpath)
         self.CP.read(self.cfgpath)
 
     def GetSettings(self):
@@ -30,6 +26,11 @@ class OptWork:
         self.settings['mtime']=self.CP.getint('Main', 'mtime')
         self.settings['pofWay']=self.CP.getint('Main', 'pofway')
         self.settings['lang_id']=self.CP.getint('Language', 'id')
+
+    def WriteDefaultConfig(self, confpath):
+        f = open(confpath, "wb")
+        f.write("[Main]\npofway = 1\nhtime = 0\ntimeout = 0\nmtime = 0\ntypeoff = 0\n[Language]\nid = 0\n")
+        f.close()
 
     def SetSettings(self, Lang_id, timeout, typeoff, htime, mtime, pofWay):
         """ Writes configuration to config file

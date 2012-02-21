@@ -3,6 +3,7 @@
 import locale
 import os
 from ConfigParser import ConfigParser
+from .reswork import loadResFile
 
 class MyLocale:
     def __init__(self):
@@ -16,14 +17,17 @@ class MyLocale:
         self.dialog_dic = {'exitlabel': '',  'attentionp1': '',  'attentionp2': '',  'typestringsh': '', 
                                 'typestringrb': ''}
         self.CP = ConfigParser()
+        self.loader = loadResFile()
         curr_locale = locale.getlocale()[0][0:2]
-        self.localepath = "/usr/share/pypoweroff/lang/%s.lng"%curr_locale
-        if os.path.exists(self.localepath):
-            self.localepath =  "/usr/share/pypoweroff/lang/"+"%s.lng"%curr_locale
+        self.localepath = []
+        if str(os.sys.platform) == "win32":
+            self.localepath.append("lang\\/%s.lng"%curr_locale)
         else:
+            self.localepath.append(self.loader.get("pypoweroff","lang/%s.lng"%curr_locale))
+        if not os.path.exists("".join(self.localepath)):
             self.localepath = None
         if self.localepath:
-            self.CP.read(self.localepath)
+            self.CP.read("".join(self.localepath))
             self.getLocale()
         else:
             self.setDefault()

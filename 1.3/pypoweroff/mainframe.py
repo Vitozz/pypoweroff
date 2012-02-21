@@ -3,7 +3,6 @@
 import os, threading
 from gi.repository import Gtk, GObject, Gdk, GdkPixbuf
 import time, string
-import signal
 from .reswork import loadResFile
 from .options import OptWork
 from .pytrayIcon import StatusIcc
@@ -15,7 +14,7 @@ if str(os.sys.platform) != "win32":
 class mainFrame():
     def __init__(self):
         self.__project = "pypoweroff"
-	self.loader = loadResFile()
+        self.loader = loadResFile()
         self.options = OptWork()
         self.language = MyLocale()
         self.time = 0
@@ -60,7 +59,7 @@ class mainFrame():
         self.timespin = self.widgetTree.get_object('timespin')
         self.hour_spin = self.widgetTree.get_object('hour_spin')
         self.min_spin = self.widgetTree.get_object('min_spin')
-	#SpinObjects
+        #SpinObjects
         self.timeobject = self.widgetTree.get_object('timeto')
         self.hourobject = self.widgetTree.get_object('hours')
         self.minobject = self.widgetTree.get_object('minutes')

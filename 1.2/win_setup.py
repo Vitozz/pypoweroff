@@ -13,11 +13,11 @@ opts = {
 setup(
     name = "pyPowerOff",
     description = ".Simple python powerroff program",
-    version = "1.2.2",
+    version = "1.2.3",
     author="Vitaly Tonkacheyev",
     author_email="thetvg@gmail.com",
     windows = [
-        {"script": "execute.py",
+        {"script": "pypoff",
         "icon_resources": [(1, "images/poweroff.ico")]
         }
     ],
