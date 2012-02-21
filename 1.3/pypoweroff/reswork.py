@@ -11,7 +11,7 @@ class loadResFile:
         pass
 
     def get(self, project, fname):
-        plist = ("/usr/share", "/usr/local/share", str(os.environ['HOME']) + "/.local/share", str(os.getcwd()[:-len(project)]))
+        plist = ("/usr/share", "/usr/local/share", str(os.environ['HOME']) + "/.local/share", str(os.getcwd())[:-len(project)])
         for path in plist:
             if path:
                 try:

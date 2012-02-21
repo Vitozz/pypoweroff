@@ -32,14 +32,21 @@ class mainFrame():
         self.minutes = None
         self.type_string = None
         self.pofway = None
+        self.gladefile = ""
+        self.widgetTree = None
         self.state = ""
         self.isclose = False
         self.max_time = int(24*3600)
         if self.systype == "windows":
             self.gladefile = 'glades\\powoff.glade'
         else:
-            self.gladefile = self.loader.get(self.__project, "glades/powoff.glade")
-        self.widgetTree = gtk.glade.XML(self.gladefile)
+            print ("Loading gladefile")
+            self.gladefile = self.loader.get(self.__project, 'glades/powoff.glade')
+        if self.gladefile:
+            self.widgetTree = gtk.glade.XML(self.gladefile)
+        else:
+            os.sys.stderr.write("ERROR: No powoff.glade file found\n")
+            os.sys.exit(1)
         dic = {"on_timespin_value_changed": self.ChangeTime, "on_reboot_toggled": self.OnShutdown,
                  "on_shutdown_toggled": self.OnShutdown, "on_timer_id1_toggled": self.SetTimerType,
                  "on_button1_pressed": self.OnButton, "on_exititem_activate": self.OnExit,
