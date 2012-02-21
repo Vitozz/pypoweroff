@@ -330,7 +330,7 @@ class mainFrame():
     def OnAbout(self, widget):
         about = gtk.AboutDialog()
         about.set_program_name("pyGTK-PowerOff")
-        about.set_version("1.2.2")
+        about.set_version("1.2.3")
         about.set_copyright("2009(c) %s (thetvg@gmail.com)"%self.language.main_dic.get('author')) 
         about.set_comments(self.language.main_dic.get('comments'))
         about.set_website("http://sites.google.com/site/thesomeprojects/")
