@@ -1017,6 +1017,17 @@
          self.staticon.connect('activate', self.onLClick)
          self.staticon.connect('popup_menu', self.popup, self.menu)
          self.staticon.set_visible(True)
+--- 1.3/setup.py
++++ 1.2/setup.py
+@@ -4,7 +4,7 @@ from distutils.core import setup
+ #from distutils.command.install_data import install_data
+ 
+ setup(name='pypoweroff',
+-      version="1.3.1",
++      version="1.2.4",
+       description='pyPowerOff package',
+       long_description = "Simple python powerroff program written on pyGTK",
+       author='Vitaly Tonkacheyev',
 --- 1.3/version.txt
 +++ 1.2/version.txt
 @@ -1 +1 @@
