@@ -8,17 +8,21 @@ from .options import OptWork
 from .pytrayIcon import StatusIcc
 from .pylocale import MyLocale
 
+MAX_TIME=int(24*3600)
+PROJECT="pypoweroff"
+VERSION="1.3.1"
+
 if str(os.sys.platform) != "win32":
     from .linux_shutdown import Shutdowner
 
 class mainFrame():
     def __init__(self):
-        self.__project = "pypoweroff"
+        """Main form class of the pypoweroff project"""
         self.loader = loadResFile()
         self.options = OptWork()
         self.language = MyLocale()
         self.time = 0
-        self.type = None
+        self.type = False
         self.systype = self.GetSysType()
         self.runed = False
         self.timer_id = None
@@ -27,15 +31,14 @@ class mainFrame():
         self.hour = None
         self.minutes = None
         self.type_string = None
-        self.pofway = None
+        self.pofway = False
         self.state = ""
         self.gladefile = ""
         self.isclose = False
-        self.max_time = int(24*3600)
         if self.systype == "windows":
             self.gladefile = 'glades\\powoff.glade'
         else:
-            self.gladefile = self.loader.get(self.__project, "glades/powoff.glade")
+            self.gladefile = self.loader.get(PROJECT, "glades/powoff.glade")
         if self.gladefile:
             self.widgetTree = Gtk.Builder()
             self.widgetTree.add_from_file(self.gladefile)
@@ -57,25 +60,28 @@ class mainFrame():
         self.window.connect("window-state-event", self.OnState)
         self.dialog = self.widgetTree.get_object('def_dialog')
         self.abortitem = self.widgetTree.get_object('stopitem')
+        self.button = self.widgetTree.get_object('poffButton')
         #DialogLabels
         self.dialog_label1 = self.widgetTree.get_object('def_dialog_label1')
         self.dialog_label2 = self.widgetTree.get_object('def_dialog_label2')
         #SpinButtons
-        self.timespin = self.widgetTree.get_object('timespin')
-        self.hour_spin = self.widgetTree.get_object('hour_spin')
-        self.min_spin = self.widgetTree.get_object('min_spin')
+        timespin = self.widgetTree.get_object('timespin')
+        hour_spin = self.widgetTree.get_object('hour_spin')
+        min_spin = self.widgetTree.get_object('min_spin')
         #SpinObjects
         self.timeobject = self.widgetTree.get_object('timeto')
         self.hourobject = self.widgetTree.get_object('hours')
         self.minobject = self.widgetTree.get_object('minutes')
         #MainWindowLabels
-        self.window_label1 = self.widgetTree.get_object('label1')
-        self.window_label2 = self.widgetTree.get_object('label3')
+        window_label1 = self.widgetTree.get_object('label1')
+        window_label2 = self.widgetTree.get_object('label3')
         #ToggleButtons
         self.poff_id1 = self.widgetTree.get_object('timer_id1')
         self.poff_id2 = self.widgetTree.get_object('timer_id2')
         self.shut_id1 = self.widgetTree.get_object('shutdown')
         self.shut_id2 = self.widgetTree.get_object('reboot')
+        #
+        self.sens_objects = (timespin, min_spin, hour_spin, window_label1, window_label2)
         #TrayIcon
         self.trayicon = None
         self.trayicon = StatusIcc(self)
@@ -91,15 +97,14 @@ class mainFrame():
         self.window.set_title(self.language.main_dic.get('title'))
         self.poff_id1.set_label(self.language.main_dic.get('timerid1'))
         self.poff_id2.set_label(self.language.main_dic.get('timerid2'))
-        self.timespin.set_tooltip_text(self.language.main_dic.get('timespin'))
-        self.window_label1.set_text(self.language.main_dic.get('label1'))
-        self.window_label2.set_text(self.language.main_dic.get('label3'))
+        self.sens_objects[0].set_tooltip_text(self.language.main_dic.get('timespin'))
+        self.sens_objects[3].set_text(self.language.main_dic.get('label1'))
+        self.sens_objects[4].set_text(self.language.main_dic.get('label3'))
         self.shut_id1.set_label(self.language.main_dic.get('shutdownlabel'))
         self.shut_id1.set_tooltip_text(self.language.main_dic.get('shutdownhint'))
         self.shut_id2.set_label(self.language.main_dic.get('rebootlabel'))
         self.shut_id2.set_tooltip_text(self.language.main_dic.get('reboothint'))
-        button = self.widgetTree.get_object('poffButton')
-        button.set_tooltip_text(self.language.main_dic.get('poffbutton'))
+        self.button.set_tooltip_text(self.language.main_dic.get('poffbutton'))
         for item in ['fileitem',  'settingsitem',  'helpitem']:
             if item:
                 menu = self.widgetTree.get_object(item)
@@ -113,18 +118,16 @@ class mainFrame():
         timeout = int(self.options.settings.get('timeout'))
         htime = int(self.options.settings.get('htime'))
         mtime = int(self.options.settings.get('mtime'))
-        self.timespin.set_value(timeout)
-        self.hour_spin.set_value(htime)
-        self.min_spin.set_value(mtime)
-        if self.options.settings.get('pofWay') == 1:
-            self.poff_id2.set_active(True)
-        elif self.options.settings.get('pofWay') == 0:
-            self.poff_id1.set_active(True)
+        self.sens_objects[0].set_value(timeout)
+        self.sens_objects[2].set_value(htime)
+        self.sens_objects[1].set_value(mtime)
+        self.pofway = bool(self.options.settings.get('pofWay'))
+        self.poff_id2.set_active(self.pofway)
+        self.poff_id1.set_active(not self.pofway)
         self.SetTimerType(None)
-        if self.options.settings.get('typeoff') == 1:
-            self.shut_id1.set_active(True)
-        elif self.options.settings.get('typeoff') == 0:
-            self.shut_id2.set_active(True)
+        self.type = bool(self.options.settings.get('typeoff'))
+        self.shut_id1.set_active(self.type)
+        self.shut_id2.set_active(not self.type)
         self.OnShutdown(None)
 
     def SaveSettings(self):
@@ -142,6 +145,7 @@ class mainFrame():
             self.runed = True
             self.trayicon.cancelitem.set_sensitive(True)
             self.abortitem.set_sensitive(True)
+            self.button.set_sensitive(False)
             self.timer_id = GObject.timeout_add(1000, self.updateTimer)
         if action == 'Stop':
             if self.timer_id:
@@ -150,7 +154,9 @@ class mainFrame():
                 self.seconds = 0
                 self.trayicon.cancelitem.set_sensitive(False)
                 self.abortitem.set_sensitive(False)
+                self.button.set_sensitive(True)
                 self.window.set_title(self.language.main_dic.get('cantitle'))
+                self.runed = False
 
     def updateTimer(self):
         if self.timer_id is not None:
@@ -170,53 +176,47 @@ class mainFrame():
 #==Work with main window elements==
 #
     def ChangeTime(self, widget):
-        if widget.get_value():
-            self.time = widget.get_value()*60
+        self.time = widget.get_value()*60
 
     def OnHour(self, widget):
-        if widget.get_value():
-            self.hour = widget.get_value()
+        self.hour = widget.get_value()
 
     def OnMinute(self, widget):
-        if widget.get_value():
-            self.minutes = widget.get_value()
+        self.minutes = widget.get_value()
 
     def OnShutdown(self, widget):
-        if self.shut_id1.get_active():
-            self.type = 1
-            self.type_string = self.language.dialog_dic.get('typestringsh')
+        isactive = self.shut_id1.get_active()
+        self.type = isactive
+        if isactive:
+                self.type_string = self.language.dialog_dic.get('typestringsh')
         else:
-            self.type = 0
-            self.type_string =  self.language.dialog_dic.get('typestringrb')
+                self.type_string =  self.language.dialog_dic.get('typestringrb')
 
     def SetTimerType(self, widget):
-        if self.poff_id1.get_active():
-            self.timespin.set_sensitive(True)
-            self.hour_spin.set_sensitive(False)
-            self.min_spin.set_sensitive(False)
-            self.window_label1.set_sensitive(False)
-            self.window_label2.set_sensitive(False)
-            self.pofway = 0
-        else:
-            self.timespin.set_sensitive(False)
-            self.hour_spin.set_sensitive(True)
-            self.min_spin.set_sensitive(True)
-            self.window_label1.set_sensitive(True)
-            self.window_label2.set_sensitive(True)
-            self.pofway = 1
+        isactive = self.poff_id1.get_active()
+        self.sens_objects[0].set_sensitive(isactive) 
+        for obj in self.sens_objects[1:]:
+             obj.set_sensitive(not isactive) 
+        self.pofway = not isactive
 
     def OnButton(self, widget):
-        if self.pofway > 0:
-            self.GetTimeToPoff()
-        else:
-            if self.timespin.get_value() <= 0:
-                self.time = 0
-            else:
-                self.time = self.timespin.get_value()*60
-        label1 =  self.language.dialog_dic.get('attentionp1') + " "+self.type_string+" "+  self.language.dialog_dic.get('attentionp2') 
-        label2 = self.convertTime(self.time)
-        print(self.time)
-        self.RunDialog(label1, label2, 'onRun')
+        if not self.runed:
+                if self.pofway:
+                        self.GetTimeToPoff()
+                else:
+                        if not self.sens_objects[0].get_value():
+                                self.time = 0
+                        else:
+                                self.time = self.sens_objects[0].get_value()*60
+                label1 =  self.language.dialog_dic.get('attentionp1') + " "+self.type_string+" "+  self.language.dialog_dic.get('attentionp2') 
+                label2 = self.convertTime(self.time)
+                #print(self.time)
+                self.RunDialog(label1, label2, 'onRun')
+                if self.systype != "windows":
+                        shutdown = Shutdowner()
+                        label3="Your computer will be"
+                        shutdown.Notify(self.loader.get(PROJECT, "images/poweroff.png"), self.language.main_dic.get('tmpsec') +":\n"+label2)
+                        del shutdown
 
     def OnCancel(self, widget):
         self.Stop()
@@ -231,7 +231,8 @@ class mainFrame():
         hour_time = 0
         min_time = 0
         sec_time = 0
-        if time>0:
+        double_null="0"*2
+        if time:
             if int(time) > 3599:
                 hour_time = int(time/3600)
                 min_time = int((time - hour_time*3600)/60)
@@ -241,9 +242,9 @@ class mainFrame():
                 sec_time = int(time - min_time*60)
             else:
                 sec_time = int(time)
-            h_time = "00"
-            m_time = "00"
-            s_time = "00"
+            h_time = double_null
+            m_time = double_null
+            s_time = double_null
             if hour_time < 10:
                 h_time = "0"+ str(hour_time)
             else:
@@ -260,15 +261,15 @@ class mainFrame():
             exitTime = "%(H)s : %(M)s : %(S)s" % formated
             return exitTime
         else:
-            exitTime = "00 : 00 : 00"
+            exitTime = (double_null + " : ")*2 +double_null
             return exitTime
 
     def GetTimeToPoff(self):
-        if self.hourobject.get_value()>0:
+        if self.hourobject.get_value():
             self.hour = self.hourobject.get_value()
         else:
             self.hour = 0
-        if self.minobject.get_value()>0:
+        if self.minobject.get_value():
             self.minutes = self.minobject.get_value()
         else:
             self.minutes = 0
@@ -278,7 +279,7 @@ class mainFrame():
         if time_in_seconds == currtime:
             self.time = 0
         elif currtime > time_in_seconds:
-            self.time = self.max_time - (currtime - time_in_seconds)
+            self.time = MAX_TIME - (currtime - time_in_seconds)
         elif currtime < time_in_seconds:
             self.time = time_in_seconds - currtime
 #
@@ -298,7 +299,7 @@ class mainFrame():
     def OnDialogOk(self, widget):
         if self.action:
             if self.action == 'onRun':
-                if self.time > 0:
+                if self.time:
                     self.OnTimer('Start')
                     self.dialog.hide()
                 else:
@@ -315,8 +316,8 @@ class mainFrame():
                     Gtk.main_quit()
                 else:
                     self.Stop()
-                    del self.trayicon
                     self.SaveSettings()
+                    del self.trayicon
                     self.isclose = True
                     self.dialog.destroy()
                     Gtk.main_quit()
@@ -328,7 +329,7 @@ class mainFrame():
     def OnAbout(self, widget):
         about = Gtk.AboutDialog()
         about.set_program_name("pyGTK-PowerOff")
-        about.set_version("1.3.0")
+        about.set_version(VERSION)
         about.set_copyright("2009(c) %s (thetvg@gmail.com)"%self.language.main_dic.get('author')) 
         about.set_comments(self.language.main_dic.get('comments'))
         about.set_website("http://sites.google.com/site/thesomeprojects/")
@@ -336,7 +337,7 @@ class mainFrame():
         if self.systype == "windows":
             about.set_logo(GdkPixbuf.Pixbuf.new_from_file("images/poweroff.png"))
         else:
-            about.set_logo(GdkPixbuf.Pixbuf.new_from_file(self.loader.get(self.__project, "images/poweroff.png")))
+            about.set_logo(GdkPixbuf.Pixbuf.new_from_file(self.loader.get(PROJECT, "images/poweroff.png")))
         about.run()
         about.destroy()
 #
@@ -344,22 +345,20 @@ class mainFrame():
 #
     def GetSysType(self):
         if str(os.sys.platform) == "win32":
-            output = "windows"
-        else:
-            output = "linux"
-        return output
+            return "windows"
+        return "linux"
 
     def GetParms(self, command=""):
         if self.systype == 'windows':
-            if self.type == 0:
-                command =  "shutdown -r"
-            elif self.type == 1:
-                command =  "shutdown -s"
+            if not self.type:
+                return "shutdown -r"
+            else:
+                return "shutdown -s"
         else:
-            if self.type == 0:
-                command =  "reboot"
-            elif self.type == 1:
-                command =  "shutdown"
+            if not self.type:
+                return "reboot"
+            else:
+                return "shutdown"
         return command
 
     def MakeAction(self, command):     
@@ -374,33 +373,27 @@ class mainFrame():
                 shutdownder.Shutdown()
 
     def Start(self, command_line):
+        self.isclose = True
         if self.systype != 'windows':
             tr1 = threading.Thread(None, self.MakeAction, name="t1", kwargs={"command": command_line})
             tr1.start()
-            self.isclose = True;
             Gtk.main_quit()
-        else:
-            self.isclose = True;
-            self.MakeAction(command_line)
+        self.MakeAction(command_line)
 
     def Stop(self):
         if self.runed:
             self.OnTimer('Stop')
-        else:
-            print("Shutdown timer not runned")
 #
 #==Work with main window==
 #
-    def OnDelete(self,  window,  event):
+    def OnDelete(self, window, event):
         if self.isclose:
-            return False
-        if self.delete:
-            self.state = "closed"
-            self.OnHide()
+            return not self.isclose
+        self.state = "closed"
+        self.OnHide()
         return True
 
     def OnHide(self):
-            print(self.window.get_property('visible'))
             if self.window.get_property('visible'):
                 self.trayicon.restoreItem.get_children()[0].set_label(self.language.tray_dic.get('restore'))
                 self.window.hide()
@@ -414,15 +407,11 @@ class mainFrame():
             self.SaveSettings()
 
     def OnDestroy(self, widget):
-        if not self.runed:
-            self.SaveSettings()
-            del self.trayicon
-            Gtk.main_quit()
-        else:
+        if self.runed:
             self.Stop()
-            del self.trayicon
-            self.SaveSettings()
-            Gtk.main_quit()
+        self.SaveSettings()
+        del self.trayicon
+        Gtk.main_quit()
 
     def OnState(self, widget, event):
         if (event.new_window_state == Gdk.WindowState.ICONIFIED) and (event.new_window_state != Gdk.WindowState.WITHDRAWN) :

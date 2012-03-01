@@ -34,6 +34,7 @@ class StatusIcc:
 
 
     def __init__(self, parent):
+        """Status icon creation class"""
         self.parent = parent
         # create a new Status Icon
         self.staticon = Gtk.StatusIcon()

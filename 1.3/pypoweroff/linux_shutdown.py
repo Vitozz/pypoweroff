@@ -20,3 +20,18 @@ class Shutdowner:
             self.ConsoleKit.get_dbus_method('Restart')()
             return True
         return False
+        
+    def Notify(self, icon,  message):
+        bus = dbus.SessionBus()
+        try:
+                service = 'org.freedesktop.Notifications'
+                path = '/org/freedesktop/Notifications'
+                iface = 'org.freedesktop.Notifications'
+                notify_interface = dbus.Interface(bus.get_object(service, path), iface)
+                if notify_interface:
+                        list=notify_interface.get_dbus_method('GetCapabilities')()
+                        if "body" in list:
+                                notify_interface.Notify("PyPowerOff", 0, icon, "Information:", message, '', '', -1)
+        except dbus.exceptions.DBusException as error:
+                import os
+                os.sys.stderr.write("%s\n"%error)

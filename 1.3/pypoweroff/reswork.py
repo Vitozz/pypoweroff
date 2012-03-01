@@ -6,7 +6,6 @@
 import os
 
 class loadResFile:
-    
     def __init__(self):
         pass
 
