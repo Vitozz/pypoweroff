@@ -1,0 +1,1059 @@
+--- 1.3/changelog
++++ 1.2/changelog
+@@ -1,10 +1,9 @@
+-pypoweroff (1.3.0-1) unstable; urgency=low
++pypoweroff (1.2.3-1) unstable; urgency=low
+ 
+-  * Interface now written on Gtk+3
+-  * Using DBUS instead shutdown
+-  * 1.2 now in it's own branch and using Gtk+2
++  * Now using DBUS
++  * Added loader module
+ 
+- -- Vitaly Tonkacheyev <thetvg@gmail.com>  Thu, 17 Feb 2012 16:40:00 +0200
++ -- Vitaly Tonkacheyev <thetvg@gmail.com>  Tue, 21 Feb 2012 12:30:00 +0200
+ 
+ pypoweroff (1.2.2-3) unstable; urgency=low
+ 
+--- 1.3/glades/powoff.glade
++++ 1.2/glades/powoff.glade
+@@ -1,272 +1,126 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<interface>
+-  <!-- interface-requires gtk+ 3.0 -->
+-  <object class="GtkDialog" id="def_dialog">
+-    <property name="can_focus">False</property>
+-    <property name="border_width">5</property>
+-    <property name="title" translatable="yes">Attention</property>
+-    <property name="resizable">False</property>
+-    <property name="modal">True</property>
+-    <property name="window_position">center</property>
+-    <property name="destroy_with_parent">True</property>
+-    <property name="type_hint">normal</property>
+-    <property name="urgency_hint">True</property>
+-    <property name="transient_for">powoff</property>
+-    <child internal-child="vbox">
+-      <object class="GtkBox" id="dialog-vbox2">
+-        <property name="visible">True</property>
+-        <property name="can_focus">False</property>
+-        <property name="spacing">2</property>
+-        <child internal-child="action_area">
+-          <object class="GtkButtonBox" id="dialog-action_area2">
+-            <property name="visible">True</property>
+-            <property name="can_focus">False</property>
+-            <property name="homogeneous">True</property>
+-            <property name="layout_style">end</property>
+-            <child>
+-              <object class="GtkButton" id="ok_button1">
+-                <property name="label">gtk-ok</property>
+-                <property name="use_action_appearance">False</property>
+-                <property name="visible">True</property>
+-                <property name="can_focus">True</property>
+-                <property name="receives_default">False</property>
+-                <property name="use_action_appearance">False</property>
+-                <property name="use_stock">True</property>
+-                <signal name="pressed" handler="on_ok_button1_pressed" swapped="no"/>
+-              </object>
+-              <packing>
+-                <property name="expand">False</property>
+-                <property name="fill">False</property>
+-                <property name="position">0</property>
+-              </packing>
+-            </child>
+-            <child>
+-              <object class="GtkButton" id="cancel_button1">
+-                <property name="label">gtk-cancel</property>
+-                <property name="use_action_appearance">False</property>
+-                <property name="visible">True</property>
+-                <property name="can_focus">True</property>
+-                <property name="receives_default">False</property>
+-                <property name="use_action_appearance">False</property>
+-                <property name="use_stock">True</property>
+-                <signal name="pressed" handler="on_cancel_button1_pressed" swapped="no"/>
+-              </object>
+-              <packing>
+-                <property name="expand">False</property>
+-                <property name="fill">False</property>
+-                <property name="position">1</property>
+-              </packing>
+-            </child>
+-          </object>
+-          <packing>
+-            <property name="expand">False</property>
+-            <property name="fill">True</property>
+-            <property name="pack_type">end</property>
+-            <property name="position">0</property>
+-          </packing>
+-        </child>
+-        <child>
+-          <object class="GtkVBox" id="vbox5">
+-            <property name="visible">True</property>
+-            <property name="can_focus">False</property>
+-            <child>
+-              <object class="GtkLabel" id="def_dialog_label1">
+-                <property name="visible">True</property>
+-                <property name="can_focus">False</property>
+-                <property name="justify">fill</property>
+-              </object>
+-              <packing>
+-                <property name="expand">True</property>
+-                <property name="fill">True</property>
+-                <property name="position">0</property>
+-              </packing>
+-            </child>
+-            <child>
+-              <object class="GtkLabel" id="def_dialog_label2">
+-                <property name="visible">True</property>
+-                <property name="can_focus">False</property>
+-                <property name="single_line_mode">True</property>
+-              </object>
+-              <packing>
+-                <property name="expand">True</property>
+-                <property name="fill">True</property>
+-                <property name="position">1</property>
+-              </packing>
+-            </child>
+-          </object>
+-          <packing>
+-            <property name="expand">True</property>
+-            <property name="fill">True</property>
+-            <property name="position">1</property>
+-          </packing>
+-        </child>
+-      </object>
+-    </child>
+-    <action-widgets>
+-      <action-widget response="0">ok_button1</action-widget>
+-      <action-widget response="0">cancel_button1</action-widget>
+-    </action-widgets>
+-  </object>
+-  <object class="GtkAdjustment" id="hours">
+-    <property name="upper">168</property>
+-    <property name="step_increment">1</property>
+-    <property name="page_increment">10</property>
+-  </object>
+-  <object class="GtkAdjustment" id="minutes">
+-    <property name="upper">59</property>
+-    <property name="step_increment">1</property>
+-    <property name="page_increment">10</property>
+-  </object>
+-  <object class="GtkAdjustment" id="timeto">
+-    <property name="upper">10080</property>
+-    <property name="step_increment">1</property>
+-    <property name="page_increment">10</property>
+-  </object>
+-  <object class="GtkWindow" id="powoff">
+-    <property name="can_focus">False</property>
++<glade-interface>
++  <!-- interface-requires gtk+ 2.16 -->
++  <!-- interface-naming-policy project-wide -->
++  <widget class="GtkWindow" id="powoff">
+     <property name="title" translatable="yes">Выключалка</property>
+     <property name="resizable">False</property>
+     <property name="window_position">center</property>
+     <property name="icon">../images/poweroff.ico</property>
+     <property name="urgency_hint">True</property>
+     <child>
+-      <object class="GtkVBox" id="vbox1">
++      <widget class="GtkVBox" id="vbox1">
+         <property name="visible">True</property>
+-        <property name="can_focus">False</property>
+         <child>
+-          <object class="GtkMenuBar" id="menubar1">
++          <widget class="GtkMenuBar" id="menubar1">
+             <property name="visible">True</property>
+-            <property name="can_focus">False</property>
+             <child>
+-              <object class="GtkMenuItem" id="fileitem">
+-                <property name="use_action_appearance">False</property>
++              <widget class="GtkMenuItem" id="fileitem">
+                 <property name="visible">True</property>
+-                <property name="can_focus">False</property>
+                 <property name="label" translatable="yes">_Файл</property>
+                 <property name="use_underline">True</property>
+-                <child type="submenu">
+-                  <object class="GtkMenu" id="sub_menu1">
++                <child>
++                  <widget class="GtkMenu" id="sub_menu1">
+                     <property name="visible">True</property>
+-                    <property name="can_focus">False</property>
+                     <child>
+-                      <object class="GtkImageMenuItem" id="exititem">
++                      <widget class="GtkImageMenuItem" id="exititem">
+                         <property name="label">gtk-quit</property>
+-                        <property name="use_action_appearance">False</property>
+                         <property name="visible">True</property>
+-                        <property name="can_focus">False</property>
+                         <property name="use_underline">True</property>
+                         <property name="use_stock">True</property>
+-                        <signal name="activate" handler="on_exititem_activate" swapped="no"/>
+-                      </object>
++                        <signal name="activate" handler="on_exititem_activate"/>
++                      </widget>
+                     </child>
+-                  </object>
++                  </widget>
+                 </child>
+-              </object>
++              </widget>
+             </child>
+             <child>
+-              <object class="GtkMenuItem" id="settingsitem">
+-                <property name="use_action_appearance">False</property>
++              <widget class="GtkMenuItem" id="settingsitem">
+                 <property name="visible">True</property>
+-                <property name="can_focus">False</property>
+                 <property name="label" translatable="yes">_Опции</property>
+                 <property name="use_underline">True</property>
+-                <child type="submenu">
+-                  <object class="GtkMenu" id="sub_menu2">
++                <child>
++                  <widget class="GtkMenu" id="sub_menu2">
+                     <property name="visible">True</property>
+-                    <property name="can_focus">False</property>
+                     <child>
+-                      <object class="GtkImageMenuItem" id="stopitem">
++                      <widget class="GtkImageMenuItem" id="stopitem">
+                         <property name="label">gtk-stop</property>
+-                        <property name="use_action_appearance">False</property>
+                         <property name="visible">True</property>
+-                        <property name="can_focus">False</property>
+                         <property name="use_underline">True</property>
+                         <property name="use_stock">True</property>
+-                        <signal name="activate" handler="on_stopitem_activate" swapped="no"/>
+-                      </object>
++                        <signal name="activate" handler="on_stopitem_activate"/>
++                      </widget>
+                     </child>
+-                  </object>
++                  </widget>
+                 </child>
+-              </object>
++              </widget>
+             </child>
+             <child>
+-              <object class="GtkMenuItem" id="helpitem">
+-                <property name="use_action_appearance">False</property>
++              <widget class="GtkMenuItem" id="helpitem">
+                 <property name="visible">True</property>
+-                <property name="can_focus">False</property>
+                 <property name="label" translatable="yes">_Справка</property>
+                 <property name="use_underline">True</property>
+-                <child type="submenu">
+-                  <object class="GtkMenu" id="sub_menu3">
++                <child>
++                  <widget class="GtkMenu" id="sub_menu3">
+                     <property name="visible">True</property>
+-                    <property name="can_focus">False</property>
+                     <child>
+-                      <object class="GtkImageMenuItem" id="aboutitem">
++                      <widget class="GtkImageMenuItem" id="aboutitem">
+                         <property name="label">gtk-about</property>
+-                        <property name="use_action_appearance">False</property>
+                         <property name="visible">True</property>
+-                        <property name="can_focus">False</property>
+                         <property name="use_underline">True</property>
+                         <property name="use_stock">True</property>
+-                        <signal name="activate" handler="on_aboutitem_activate" swapped="no"/>
+-                      </object>
++                        <signal name="activate" handler="on_aboutitem_activate"/>
++                      </widget>
+                     </child>
+-                  </object>
++                  </widget>
+                 </child>
+-              </object>
++              </widget>
+             </child>
+-          </object>
++          </widget>
+           <packing>
+             <property name="expand">False</property>
+-            <property name="fill">True</property>
+             <property name="position">0</property>
+           </packing>
+         </child>
+         <child>
+-          <object class="GtkHBox" id="hbox1">
++          <widget class="GtkHBox" id="hbox1">
+             <property name="visible">True</property>
+-            <property name="can_focus">False</property>
+             <child>
+               <placeholder/>
+             </child>
+             <child>
+-              <object class="GtkVBox" id="vbox2">
++              <widget class="GtkVBox" id="vbox2">
+                 <property name="visible">True</property>
+-                <property name="can_focus">False</property>
+                 <child>
+-                  <object class="GtkRadioButton" id="timer_id1">
++                  <widget class="GtkRadioButton" id="timer_id1">
+                     <property name="label" translatable="yes">Время до выключения (мин)</property>
+-                    <property name="use_action_appearance">False</property>
+                     <property name="visible">True</property>
+                     <property name="can_focus">True</property>
+                     <property name="receives_default">False</property>
+-                    <property name="use_action_appearance">False</property>
+                     <property name="active">True</property>
+                     <property name="draw_indicator">True</property>
+                     <property name="group">timer_id2</property>
+-                    <signal name="toggled" handler="on_timer_id1_toggled" swapped="no"/>
+-                  </object>
++                    <signal name="toggled" handler="on_timer_id1_toggled"/>
++                  </widget>
+                   <packing>
+-                    <property name="expand">True</property>
+-                    <property name="fill">True</property>
+                     <property name="position">0</property>
+                   </packing>
+                 </child>
+                 <child>
+-                  <object class="GtkSpinButton" id="timespin">
++                  <widget class="GtkSpinButton" id="timespin">
+                     <property name="visible">True</property>
+                     <property name="can_focus">True</property>
+                     <property name="has_tooltip">True</property>
++                    <property name="tooltip" translatable="yes">Время до выключения / перезагрузки</property>
+                     <property name="invisible_char">●</property>
+                     <property name="shadow_type">etched-out</property>
+                     <property name="primary_icon_stock">gtk-add</property>
+-                    <property name="primary_icon_activatable">False</property>
+-                    <property name="secondary_icon_activatable">False</property>
+-                    <property name="adjustment">timeto</property>
++                    <property name="adjustment">0 0 3600 1 0 0</property>
+                     <property name="climb_rate">2</property>
+                     <property name="numeric">True</property>
+-                    <signal name="value-changed" handler="on_timespin_value_changed" swapped="no"/>
+-                  </object>
++                    <signal name="value_changed" handler="on_timespin_value_changed"/>
++                  </widget>
+                   <packing>
+                     <property name="expand">False</property>
+                     <property name="fill">False</property>
+@@ -274,135 +128,106 @@
+                   </packing>
+                 </child>
+                 <child>
+-                  <object class="GtkRadioButton" id="timer_id2">
++                  <widget class="GtkRadioButton" id="timer_id2">
+                     <property name="label" translatable="yes">Выключить в (часы:минуты)</property>
+-                    <property name="use_action_appearance">False</property>
+                     <property name="visible">True</property>
+                     <property name="can_focus">True</property>
+                     <property name="receives_default">False</property>
+-                    <property name="use_action_appearance">False</property>
+                     <property name="active">True</property>
+                     <property name="draw_indicator">True</property>
+-                    <signal name="toggled" handler="on_timer_id2_toggled" swapped="no"/>
+-                  </object>
++                    <signal name="toggled" handler="on_timer_id2_toggled"/>
++                  </widget>
+                   <packing>
+-                    <property name="expand">True</property>
+-                    <property name="fill">True</property>
+                     <property name="position">2</property>
+                   </packing>
+                 </child>
+                 <child>
+-                  <object class="GtkVBox" id="vbox4">
++                  <widget class="GtkVBox" id="vbox4">
+                     <property name="visible">True</property>
+-                    <property name="can_focus">False</property>
+                     <child>
+-                      <object class="GtkHBox" id="hbox2">
++                      <widget class="GtkHBox" id="hbox2">
+                         <property name="visible">True</property>
+-                        <property name="can_focus">False</property>
+                         <property name="homogeneous">True</property>
+                         <child>
+-                          <object class="GtkLabel" id="label1">
++                          <widget class="GtkLabel" id="label1">
+                             <property name="visible">True</property>
+-                            <property name="can_focus">False</property>
+                             <property name="label" translatable="yes">Часы:</property>
+-                          </object>
++                          </widget>
+                           <packing>
+-                            <property name="expand">True</property>
+-                            <property name="fill">True</property>
+                             <property name="position">0</property>
+                           </packing>
+                         </child>
+                         <child>
+-                          <object class="GtkLabel" id="label3">
++                          <widget class="GtkLabel" id="label3">
+                             <property name="visible">True</property>
+-                            <property name="can_focus">False</property>
+                             <property name="label" translatable="yes">Минуты:</property>
+-                          </object>
++                          </widget>
+                           <packing>
+-                            <property name="expand">True</property>
+-                            <property name="fill">True</property>
+                             <property name="position">1</property>
+                           </packing>
+                         </child>
+-                      </object>
++                      </widget>
+                       <packing>
+-                        <property name="expand">True</property>
+-                        <property name="fill">True</property>
+                         <property name="position">0</property>
+                       </packing>
+                     </child>
+                     <child>
+-                      <object class="GtkHBox" id="hbox3">
++                      <widget class="GtkHBox" id="hbox3">
+                         <property name="visible">True</property>
+-                        <property name="can_focus">False</property>
+                         <child>
+-                          <object class="GtkSpinButton" id="hour_spin">
++                          <widget class="GtkSpinButton" id="hour_spin">
+                             <property name="visible">True</property>
+                             <property name="can_focus">True</property>
+                             <property name="invisible_char">●</property>
+-                            <property name="primary_icon_activatable">False</property>
+-                            <property name="secondary_icon_activatable">False</property>
+-                            <property name="adjustment">hours</property>
++                            <property name="adjustment">0 0 24 1 0 0</property>
+                             <property name="numeric">True</property>
+-                            <signal name="value-changed" handler="on_hour_spin_value_changed" swapped="no"/>
+-                          </object>
++                            <signal name="value_changed" handler="on_hour_spin_value_changed"/>
++                          </widget>
+                           <packing>
+-                            <property name="expand">True</property>
+-                            <property name="fill">True</property>
+                             <property name="position">0</property>
+                           </packing>
+                         </child>
+                         <child>
+-                          <object class="GtkSpinButton" id="min_spin">
++                          <widget class="GtkSpinButton" id="min_spin">
+                             <property name="visible">True</property>
+                             <property name="can_focus">True</property>
+                             <property name="invisible_char">●</property>
+-                            <property name="primary_icon_activatable">False</property>
+-                            <property name="secondary_icon_activatable">False</property>
+-                            <property name="adjustment">minutes</property>
++                            <property name="adjustment">0 0 59 1 0 0</property>
+                             <property name="numeric">True</property>
+-                            <signal name="value-changed" handler="on_min_spin_value_changed" swapped="no"/>
+-                          </object>
++                            <signal name="value_changed" handler="on_min_spin_value_changed"/>
++                          </widget>
+                           <packing>
+-                            <property name="expand">True</property>
+-                            <property name="fill">True</property>
+                             <property name="position">1</property>
+                           </packing>
+                         </child>
+-                      </object>
++                      </widget>
+                       <packing>
+-                        <property name="expand">True</property>
+-                        <property name="fill">True</property>
+                         <property name="position">1</property>
+                       </packing>
+                     </child>
+-                  </object>
++                  </widget>
+                   <packing>
+-                    <property name="expand">True</property>
+-                    <property name="fill">True</property>
+                     <property name="position">3</property>
+                   </packing>
+                 </child>
+                 <child>
+-                  <object class="GtkVButtonBox" id="vbuttonbox1">
++                  <widget class="GtkVButtonBox" id="vbuttonbox1">
+                     <property name="visible">True</property>
+-                    <property name="can_focus">False</property>
+                     <property name="homogeneous">True</property>
+                     <property name="layout_style">start</property>
+                     <child>
+-                      <object class="GtkRadioButton" id="reboot">
++                      <widget class="GtkRadioButton" id="reboot">
+                         <property name="label">Перезагрузка</property>
+-                        <property name="use_action_appearance">False</property>
+                         <property name="visible">True</property>
+                         <property name="can_focus">True</property>
+                         <property name="receives_default">False</property>
+                         <property name="has_tooltip">True</property>
+-                        <property name="use_action_appearance">False</property>
++                        <property name="tooltip" translatable="yes">Перезагрузка системы</property>
+                         <property name="active">True</property>
+                         <property name="draw_indicator">True</property>
+                         <property name="group">shutdown</property>
+-                        <signal name="toggled" handler="on_reboot_toggled" swapped="no"/>
+-                      </object>
++                        <signal name="toggled" handler="on_reboot_toggled"/>
++                      </widget>
+                       <packing>
+                         <property name="expand">False</property>
+                         <property name="fill">False</property>
+@@ -410,35 +235,31 @@
+                       </packing>
+                     </child>
+                     <child>
+-                      <object class="GtkRadioButton" id="shutdown">
++                      <widget class="GtkRadioButton" id="shutdown">
+                         <property name="label">Выключение</property>
+-                        <property name="use_action_appearance">False</property>
+                         <property name="visible">True</property>
+                         <property name="can_focus">True</property>
+                         <property name="receives_default">False</property>
+                         <property name="has_tooltip">True</property>
+-                        <property name="use_action_appearance">False</property>
++                        <property name="tooltip" translatable="yes">Выключение системы</property>
+                         <property name="active">True</property>
+                         <property name="draw_indicator">True</property>
+-                        <signal name="toggled" handler="on_shutdown_toggled" swapped="no"/>
+-                      </object>
++                        <signal name="toggled" handler="on_shutdown_toggled"/>
++                      </widget>
+                       <packing>
+                         <property name="expand">False</property>
+                         <property name="fill">False</property>
+                         <property name="position">1</property>
+                       </packing>
+                     </child>
+-                  </object>
++                  </widget>
+                   <packing>
+-                    <property name="expand">True</property>
+                     <property name="fill">False</property>
+                     <property name="position">4</property>
+                   </packing>
+                 </child>
+-              </object>
++              </widget>
+               <packing>
+-                <property name="expand">True</property>
+-                <property name="fill">True</property>
+                 <property name="position">1</property>
+               </packing>
+             </child>
+@@ -446,8 +267,7 @@
+               <placeholder/>
+             </child>
+             <child>
+-              <object class="GtkButton" id="poffButton">
+-                <property name="use_action_appearance">False</property>
++              <widget class="GtkButton" id="poffButton">
+                 <property name="width_request">130</property>
+                 <property name="height_request">130</property>
+                 <property name="visible">True</property>
+@@ -455,17 +275,16 @@
+                 <property name="has_focus">True</property>
+                 <property name="receives_default">False</property>
+                 <property name="has_tooltip">True</property>
+-                <property name="use_action_appearance">False</property>
++                <property name="tooltip" translatable="yes">Выключить / Перезагрузить</property>
+                 <property name="relief">none</property>
+-                <signal name="pressed" handler="on_button1_pressed" swapped="no"/>
++                <signal name="pressed" handler="on_button1_pressed"/>
+                 <child>
+-                  <object class="GtkImage" id="image1">
++                  <widget class="GtkImage" id="image1">
+                     <property name="visible">True</property>
+-                    <property name="can_focus">False</property>
+                     <property name="pixbuf">../images/poweroff.png</property>
+-                  </object>
++                  </widget>
+                 </child>
+-              </object>
++              </widget>
+               <packing>
+                 <property name="expand">False</property>
+                 <property name="fill">False</property>
+@@ -475,14 +294,97 @@
+             <child>
+               <placeholder/>
+             </child>
+-          </object>
++          </widget>
++          <packing>
++            <property name="position">1</property>
++          </packing>
++        </child>
++      </widget>
++    </child>
++  </widget>
++  <widget class="GtkDialog" id="def_dialog">
++    <property name="border_width">5</property>
++    <property name="title" translatable="yes">Attention</property>
++    <property name="resizable">False</property>
++    <property name="modal">True</property>
++    <property name="window_position">center</property>
++    <property name="destroy_with_parent">True</property>
++    <property name="type_hint">normal</property>
++    <property name="urgency_hint">True</property>
++    <property name="transient_for">powoff</property>
++    <child internal-child="vbox">
++      <widget class="GtkVBox" id="dialog-vbox2">
++        <property name="visible">True</property>
++        <property name="spacing">2</property>
++        <child>
++          <widget class="GtkVBox" id="vbox5">
++            <property name="visible">True</property>
++            <child>
++              <widget class="GtkLabel" id="def_dialog_label1">
++                <property name="visible">True</property>
++                <property name="justify">fill</property>
++              </widget>
++              <packing>
++                <property name="position">0</property>
++              </packing>
++            </child>
++            <child>
++              <widget class="GtkLabel" id="def_dialog_label2">
++                <property name="visible">True</property>
++                <property name="single_line_mode">True</property>
++              </widget>
++              <packing>
++                <property name="position">1</property>
++              </packing>
++            </child>
++          </widget>
+           <packing>
+-            <property name="expand">True</property>
+-            <property name="fill">True</property>
+             <property name="position">1</property>
+           </packing>
+         </child>
+-      </object>
++        <child internal-child="action_area">
++          <widget class="GtkHButtonBox" id="dialog-action_area2">
++            <property name="visible">True</property>
++            <property name="homogeneous">True</property>
++            <property name="layout_style">end</property>
++            <child>
++              <widget class="GtkButton" id="ok_button1">
++                <property name="label">gtk-ok</property>
++                <property name="visible">True</property>
++                <property name="can_focus">True</property>
++                <property name="receives_default">False</property>
++                <property name="use_stock">True</property>
++                <signal name="pressed" handler="on_ok_button1_pressed"/>
++              </widget>
++              <packing>
++                <property name="expand">False</property>
++                <property name="fill">False</property>
++                <property name="position">0</property>
++              </packing>
++            </child>
++            <child>
++              <widget class="GtkButton" id="cancel_button1">
++                <property name="label">gtk-cancel</property>
++                <property name="visible">True</property>
++                <property name="can_focus">True</property>
++                <property name="receives_default">False</property>
++                <property name="use_stock">True</property>
++                <signal name="pressed" handler="on_cancel_button1_pressed"/>
++              </widget>
++              <packing>
++                <property name="expand">False</property>
++                <property name="fill">False</property>
++                <property name="position">1</property>
++              </packing>
++            </child>
++          </widget>
++          <packing>
++            <property name="expand">False</property>
++            <property name="pack_type">end</property>
++            <property name="position">0</property>
++          </packing>
++        </child>
++      </widget>
+     </child>
+-  </object>
+-</interface>
++  </widget>
++</glade-interface>
+--- 1.3/pypoff
++++ 1.2/pypoff
+@@ -18,7 +18,9 @@
+ # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ 
+ 
+-from gi.repository import Gtk
++import pygtk
++pygtk.require('2.0')
++import gtk
+ 
+ import pypoweroff
+ from pypoweroff.mainframe import mainFrame
+@@ -27,4 +29,4 @@ from pypoweroff.mainframe import mainFra
+ 
+ if __name__ == "__main__":
+     newFrame = mainFrame()
+-    Gtk.main()
++    gtk.main()
+--- 1.3/pypoweroff/mainframe.py
++++ 1.2/pypoweroff/mainframe.py
+@@ -1,7 +1,11 @@
+ #-*- coding: utf-8 -*-
+ 
+ import os, threading
+-from gi.repository import Gtk, GObject, Gdk, GdkPixbuf
++import pygtk
++pygtk.require('2.0')
++import gtk
++import gtk.glade
++import gobject
+ import time, string
+ from .reswork import loadResFile
+ from .options import OptWork
+@@ -10,7 +14,7 @@ from .pylocale import MyLocale
+ 
+ MAX_TIME=int(24*3600)
+ PROJECT="pypoweroff"
+-VERSION="1.3.1"
++VERSION="1.2.4"
+ 
+ if str(os.sys.platform) != "win32":
+     from .linux_shutdown import Shutdowner
+@@ -32,16 +36,17 @@ class mainFrame():
+         self.minutes = None
+         self.type_string = None
+         self.pofway = False
+-        self.state = ""
+         self.gladefile = ""
++        self.widgetTree = None
++        self.state = ""
+         self.isclose = False
+         if self.systype == "windows":
+             self.gladefile = 'glades\\powoff.glade'
+         else:
++            print ("Loading gladefile")
+             self.gladefile = self.loader.get(PROJECT, "glades/powoff.glade")
+         if self.gladefile:
+-            self.widgetTree = Gtk.Builder()
+-            self.widgetTree.add_from_file(self.gladefile)
++            self.widgetTree = gtk.glade.XML(self.gladefile)
+         else:
+             os.sys.stderr.write("ERROR: No powoff.glade file found\n")
+             os.sys.exit(1)
+@@ -52,35 +57,29 @@ class mainFrame():
+                  "on_min_spin_value_changed": self.OnMinute, "on_ok_button1_pressed": self.OnDialogOk,
+                  "on_cancel_button1_pressed": self.OnDialogCancel,
+                  "on_aboutitem_activate": self.OnAbout, "on_stopitem_activate": self.OnCancel}
+-        self.widgetTree.get_objects()
+-        self.widgetTree.connect_signals(dic)
+-        self.window = self.widgetTree.get_object('powoff')
++        self.widgetTree.signal_autoconnect(dic)
++        self.window = self.widgetTree.get_widget('powoff')
+         self.delete = self.window.connect("delete-event", self.OnDelete)
+         self.window.connect("destroy-event", self.OnDelete)
+         self.window.connect("window-state-event", self.OnState)
+-        self.dialog = self.widgetTree.get_object('def_dialog')
+-        self.abortitem = self.widgetTree.get_object('stopitem')
+-        self.button = self.widgetTree.get_object('poffButton')
++        self.dialog = self.widgetTree.get_widget('def_dialog')
++        self.abortitem = self.widgetTree.get_widget('stopitem')
++        self.button = self.widgetTree.get_widget('poffButton')
+         #DialogLabels
+-        self.dialog_label1 = self.widgetTree.get_object('def_dialog_label1')
+-        self.dialog_label2 = self.widgetTree.get_object('def_dialog_label2')
++        self.dialog_label1 = self.widgetTree.get_widget('def_dialog_label1')
++        self.dialog_label2 = self.widgetTree.get_widget('def_dialog_label2')
+         #SpinButtons
+-        timespin = self.widgetTree.get_object('timespin')
+-        hour_spin = self.widgetTree.get_object('hour_spin')
+-        min_spin = self.widgetTree.get_object('min_spin')
+-        #SpinObjects
+-        self.timeobject = self.widgetTree.get_object('timeto')
+-        self.hourobject = self.widgetTree.get_object('hours')
+-        self.minobject = self.widgetTree.get_object('minutes')
++        timespin = self.widgetTree.get_widget('timespin')
++        hour_spin = self.widgetTree.get_widget('hour_spin')
++        min_spin = self.widgetTree.get_widget('min_spin')
+         #MainWindowLabels
+-        window_label1 = self.widgetTree.get_object('label1')
+-        window_label2 = self.widgetTree.get_object('label3')
++        window_label1 = self.widgetTree.get_widget('label1')
++        window_label2 = self.widgetTree.get_widget('label3')
+         #ToggleButtons
+-        self.poff_id1 = self.widgetTree.get_object('timer_id1')
+-        self.poff_id2 = self.widgetTree.get_object('timer_id2')
+-        self.shut_id1 = self.widgetTree.get_object('shutdown')
+-        self.shut_id2 = self.widgetTree.get_object('reboot')
+-        #
++        self.poff_id1 = self.widgetTree.get_widget('timer_id1')
++        self.poff_id2 = self.widgetTree.get_widget('timer_id2')
++        self.shut_id1 = self.widgetTree.get_widget('shutdown')
++        self.shut_id2 = self.widgetTree.get_widget('reboot')
+         self.sens_objects = (timespin, min_spin, hour_spin, window_label1, window_label2)
+         #TrayIcon
+         self.trayicon = None
+@@ -107,9 +106,8 @@ class mainFrame():
+         self.button.set_tooltip_text(self.language.main_dic.get('poffbutton'))
+         for item in ['fileitem',  'settingsitem',  'helpitem']:
+             if item:
+-                menu = self.widgetTree.get_object(item)
++                menu = self.widgetTree.get_widget(item)
+                 menu.set_label(self.language.menu_dic.get(item))
+-
+ #
+ #==Work with Settings==
+ #
+@@ -131,9 +129,9 @@ class mainFrame():
+         self.OnShutdown(None)
+ 
+     def SaveSettings(self):
+-        timeout = int(self.timeobject.get_value())
+-        htime = int(self.hourobject.get_value())
+-        mtime = int(self.minobject.get_value())
++        timeout = int(self.sens_objects[0].get_value())
++        htime = int(self.sens_objects[2].get_value())
++        mtime = int(self.sens_objects[1].get_value())
+         self.options.SetSettings(0,timeout,int(self.type),htime,mtime,int(self.pofway))
+         self.options.WriteConfig()
+ #
+@@ -143,15 +141,17 @@ class mainFrame():
+         if action == 'Start':
+             self.seconds = 0
+             self.runed = True
++            self.trayicon.staticon.set_blinking(True)
+             self.trayicon.cancelitem.set_sensitive(True)
+             self.abortitem.set_sensitive(True)
+             self.button.set_sensitive(False)
+-            self.timer_id = GObject.timeout_add(1000, self.updateTimer)
++            self.timer_id = gobject.timeout_add(1000, self.updateTimer)
+         if action == 'Stop':
+             if self.timer_id:
+-                GObject.source_remove(self.timer_id)
++                gobject.source_remove(self.timer_id)
+                 self.timer_id = None
+                 self.seconds = 0
++                self.trayicon.staticon.set_blinking(False)
+                 self.trayicon.cancelitem.set_sensitive(False)
+                 self.abortitem.set_sensitive(False)
+                 self.button.set_sensitive(True)
+@@ -164,7 +164,7 @@ class mainFrame():
+                 self.seconds += 1
+                 tmpsec = self.language.main_dic.get('tmpsec') + " - " + self.convertTime(self.time - self.seconds)
+                 self.window.set_title(tmpsec)
+-                self.trayicon.staticon.set_tooltip_text(tmpsec)
++                self.trayicon.staticon.set_tooltip(tmpsec)
+                 return True
+             else:
+                 self.Start(self.GetParms())
+@@ -263,12 +263,12 @@ class mainFrame():
+             return exitTime
+ 
+     def GetTimeToPoff(self):
+-        if self.hourobject.get_value():
+-            self.hour = self.hourobject.get_value()
++        if self.sens_objects[2].get_value():
++            self.hour = self.sens_objects[2].get_value()
+         else:
+             self.hour = 0
+-        if self.minobject.get_value():
+-            self.minutes = self.minobject.get_value()
++        if self.sens_objects[1].get_value():
++            self.minutes = self.sens_objects[1].get_value()
+         else:
+             self.minutes = 0
+         time_in_seconds = int(self.hour*3600 + self.minutes*60)
+@@ -311,21 +311,21 @@ class mainFrame():
+                     del self.trayicon
+                     self.isclose = True
+                     self.dialog.destroy()
+-                    Gtk.main_quit()
++                    gtk.main_quit()
+                 else:
+                     self.Stop()
+                     self.SaveSettings()
+-                    del self.trayicon
++                    del self.trayicon                    
+                     self.isclose = True
+                     self.dialog.destroy()
+-                    Gtk.main_quit()
++                    gtk.main_quit()
+ 
+     def OnDialogCancel(self, widget):
+         self.dialog.hide()
+ 
+ #About dialog
+     def OnAbout(self, widget):
+-        about = Gtk.AboutDialog()
++        about = gtk.AboutDialog()
+         about.set_program_name("pyGTK-PowerOff")
+         about.set_version(VERSION)
+         about.set_copyright("2009(c) %s (thetvg@gmail.com)"%self.language.main_dic.get('author')) 
+@@ -333,9 +333,9 @@ class mainFrame():
+         about.set_website("http://sites.google.com/site/thesomeprojects/")
+         about.set_website_label(self.language.main_dic.get('website'))
+         if self.systype == "windows":
+-            about.set_logo(GdkPixbuf.Pixbuf.new_from_file("images/poweroff.png"))
++            about.set_logo(gtk.gdk.pixbuf_new_from_file("images/poweroff.png"))
+         else:
+-            about.set_logo(GdkPixbuf.Pixbuf.new_from_file(self.loader.get(PROJECT, "images/poweroff.png")))
++            about.set_logo(gtk.gdk.pixbuf_new_from_file(self.loader.get(self.__project, "images/poweroff.png")))
+         about.run()
+         about.destroy()
+ #
+@@ -359,10 +359,10 @@ class mainFrame():
+                 return "shutdown"
+         return command
+ 
+-    def MakeAction(self, command):     
++    def MakeAction(self, command):
+         if self.systype == 'windows':
+             os.system(command)
+-            Gtk.main_quit()
++            gtk.main_quit()
+         else:
+             shutdownder = Shutdowner()
+             if command == "reboot":
+@@ -375,7 +375,8 @@ class mainFrame():
+         if self.systype != 'windows':
+             tr1 = threading.Thread(None, self.MakeAction, name="t1", kwargs={"command": command_line})
+             tr1.start()
+-            Gtk.main_quit()
++            self.isclose = True;
++            gtk.main_quit()
+         self.MakeAction(command_line)
+ 
+     def Stop(self):
+@@ -409,10 +410,10 @@ class mainFrame():
+             self.Stop()
+         self.SaveSettings()
+         del self.trayicon
+-        Gtk.main_quit()
++        gtk.main_quit()
+ 
+     def OnState(self, widget, event):
+-        if (event.new_window_state == Gdk.WindowState.ICONIFIED) and (event.new_window_state != Gdk.WindowState.WITHDRAWN) :
++        if (event.new_window_state == gtk.gdk.WINDOW_STATE_ICONIFIED) and (event.new_window_state != gtk.gdk.WINDOW_STATE_WITHDRAWN) :
+             self.trayicon.restoreItem.get_children()[0].set_label(self.language.tray_dic.get('restore'))
+             self.state = "iconified"
+             self.window.hide()
+--- 1.3/pypoweroff/options.py
++++ 1.2/pypoweroff/options.py
+@@ -17,7 +17,7 @@ class OptWork:
+             self.cfgpath = "config.cfg"
+             if not os.path.exists(self.cfgpath):
+                 self.WriteDefaultConfig(self.cfgpath)
+-                
++
+         self.CP.read(self.cfgpath)
+ 
+     def GetSettings(self):
+--- 1.3/pypoweroff/pytrayIcon.py
++++ 1.2/pypoweroff/pytrayIcon.py
+@@ -1,7 +1,13 @@
+ #!/usr/bin/env python
+ #-*- coding: utf-8 -*-
+ import os
+-from gi.repository import Gtk
++try:
++    import pygtk
++    pygtk.require('2.0')
++    import gtk
++except:
++    os.sys.stderr.write('No Gtk Module Found')
++    os.sys.exit(1)
+ 
+ class StatusIcc:
+     # activate callback
+@@ -13,9 +19,7 @@ class StatusIcc:
+         if button == 3:
+             if data:
+                 data.show_all()
+-                data.popup(None, None, None, None, button, time)
+-                return True
+-        return False
++                data.popup(None, None, None, 3, time)
+ 
+     def onLClick(self, widget, data=None):
+         self.parent.OnHide()
+@@ -37,28 +41,28 @@ class StatusIcc:
+         """Status icon creation class"""
+         self.parent = parent
+         # create a new Status Icon
+-        self.staticon = Gtk.StatusIcon()
++        self.staticon = gtk.StatusIcon()
+         #create Popup-menu
+-        self.menu = Gtk.Menu()
++        self.menu = gtk.Menu()
+         #Restore
+-        self.restoreItem = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_GO_UP,  None)
++        self.restoreItem = gtk.ImageMenuItem(gtk.STOCK_GO_UP)
+         self.restoreItem.connect('activate', self.on_hide_resore)
+         self.menu.append(self.restoreItem)
+         self.restoreItem.get_children()[0].set_label(self.parent.language.tray_dic.get('restorehide'))
+-        separator1 = Gtk.SeparatorMenuItem()
++        separator1 = gtk.SeparatorMenuItem()
+         self.menu.append(separator1)
+         #Mixer
+-        self.cancelitem = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_CANCEL, None)
++        self.cancelitem = gtk.ImageMenuItem(gtk.STOCK_CANCEL)
+         self.cancelitem.connect('activate', self.onAbort)
+         self.menu.append(self.cancelitem)
+-        separator2 = Gtk.SeparatorMenuItem()
++        separator2 = gtk.SeparatorMenuItem()
+         self.menu.append(separator2)
+         #About
+-        self.aboutItem = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_ABOUT,  None)
++        self.aboutItem = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
+         self.aboutItem.connect('activate', self.onAbout)
+         self.menu.append(self.aboutItem)
+         #Quit
+-        self.quitItem = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_QUIT,  None)
++        self.quitItem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
+         self.quitItem.connect('activate', self.onQuit, self.staticon)
+         self.menu.append(self.quitItem)
+         #
+@@ -67,7 +71,7 @@ class StatusIcc:
+         else:
+             self.staticon.set_from_file(self.parent.loader.get("pypoweroff", "images/tb_icon.png"))
+         self.status_tooltip = self.parent.language.tray_dic.get('tooltip')
+-        self.staticon.set_tooltip_text(self.status_tooltip)
++        self.staticon.set_tooltip(self.status_tooltip)
+         self.staticon.connect('activate', self.onLClick)
+         self.staticon.connect('popup_menu', self.popup, self.menu)
+         self.staticon.set_visible(True)
+--- 1.3/version.txt
++++ 1.2/version.txt
+@@ -1 +1 @@
+-1.3.1
++1.2.4
+\ В конце файла нет новой строки
+--- 1.3/win_setup.py
++++ 1.2/win_setup.py
+@@ -0,0 +1,31 @@
++#!/usr/bin/env python
++# setup.py
++from distutils.core import setup
++import py2exe
++import glob
++
++opts = {
++    "py2exe": {
++        "includes": "cairo, pango, pangocairo, atk, gobject",
++        }
++    }
++
++setup(
++    name = "pyPowerOff",
++    description = ".Simple python powerroff program",
++    version = "1.2.3",
++    author="Vitaly Tonkacheyev",
++    author_email="thetvg@gmail.com",
++    windows = [
++        {"script": "pypoff",
++        "icon_resources": [(1, "images/poweroff.ico")]
++        }
++    ],
++    packages = ["pypoweroff"],
++    options=opts,
++    data_files=[("images", ["images/poweroff.png",
++                "images/poweroff.ico", "images/tb_icon.png"]),
++                "COPYING",
++                ("glades", ["glades/powoff.glade"])
++    ],
++)

@@ -43,7 +43,7 @@ class mainFrame():
             self.widgetTree = Gtk.Builder()
             self.widgetTree.add_from_file(self.gladefile)
         else:
-            os.sys.stderr.write("ERROR: No powoff.glade file found")
+            os.sys.stderr.write("ERROR: No powoff.glade file found\n")
             os.sys.exit(1)
         dic = {"on_timespin_value_changed": self.ChangeTime, "on_reboot_toggled": self.OnShutdown,
                  "on_shutdown_toggled": self.OnShutdown, "on_timer_id1_toggled": self.SetTimerType,
@@ -188,9 +188,9 @@ class mainFrame():
         isactive = self.shut_id1.get_active()
         self.type = isactive
         if isactive:
-                self.type_string = self.language.dialog_dic.get('typestringsh')
+            self.type_string = self.language.dialog_dic.get('typestringsh')
         else:
-                self.type_string =  self.language.dialog_dic.get('typestringrb')
+            self.type_string =  self.language.dialog_dic.get('typestringrb')
 
     def SetTimerType(self, widget):
         isactive = self.poff_id1.get_active()
@@ -201,22 +201,20 @@ class mainFrame():
 
     def OnButton(self, widget):
         if not self.runed:
-                if self.pofway:
-                        self.GetTimeToPoff()
+            if self.pofway:
+                self.GetTimeToPoff()
+            else:
+                if not self.sens_objects[0].get_value():
+                    self.time = 0
                 else:
-                        if not self.sens_objects[0].get_value():
-                                self.time = 0
-                        else:
-                                self.time = self.sens_objects[0].get_value()*60
-                label1 =  self.language.dialog_dic.get('attentionp1') + " "+self.type_string+" "+  self.language.dialog_dic.get('attentionp2') 
-                label2 = self.convertTime(self.time)
-                #print(self.time)
-                self.RunDialog(label1, label2, 'onRun')
-                if self.systype != "windows":
-                        shutdown = Shutdowner()
-                        label3="Your computer will be"
-                        shutdown.Notify(self.loader.get(PROJECT, "images/poweroff.png"), self.language.main_dic.get('tmpsec') +":\n"+label2)
-                        del shutdown
+                    self.time = self.sens_objects[0].get_value()*60
+            label1 =  self.language.dialog_dic.get('attentionp1') + " "+self.type_string+" "+  self.language.dialog_dic.get('attentionp2') 
+            label2 = self.convertTime(self.time)
+            self.RunDialog(label1, label2, 'onRun')
+            if self.systype != "windows":
+                shutdown = Shutdowner()
+                shutdown.Notify(self.loader.get(PROJECT, "images/poweroff.png"), self.language.main_dic.get('tmpsec') +":\n"+label2)
+                del shutdown
 
     def OnCancel(self, widget):
         self.Stop()

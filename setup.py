@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
-from distutils.command.install_data import install_data
+#from distutils.command.install_data import install_data
+from pypoweroff import mainframe
 
 setup(name='pypoweroff',
-      version='1.3.0',
+      version=mainframe.VERSION,
       description='pyPowerOff package',
       long_description = "Simple python powerroff program written on pyGTK",
       author='Vitaly Tonkacheyev',
