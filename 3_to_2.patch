@@ -892,7 +892,7 @@
 +            about.set_logo(gtk.gdk.pixbuf_new_from_file("images/poweroff.png"))
          else:
 -            about.set_logo(GdkPixbuf.Pixbuf.new_from_file(self.loader.get(PROJECT, "images/poweroff.png")))
-+            about.set_logo(gtk.gdk.pixbuf_new_from_file(self.loader.get(self.__project, "images/poweroff.png")))
++            about.set_logo(gtk.gdk.pixbuf_new_from_file(self.loader.get(PROJECT, "images/poweroff.png")))
          about.run()
          about.destroy()
  #
