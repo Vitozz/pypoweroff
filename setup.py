@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
-#from distutils.command.install_data import install_data
+import os
+
+def get_version ():
+      f = open("version.txt", "r")
+      f.seek(0)
+      lines = f.read()
+      f.close()
+      return "".join(lines).split("\n")[0]
 
 setup(name='pypoweroff',
-      version="1.3.1",
+      version=get_version(),
       description='pyPowerOff package',
       long_description = "Simple python powerroff program written on pyGTK",
       author='Vitaly Tonkacheyev',

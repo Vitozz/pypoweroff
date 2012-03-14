@@ -1017,17 +1017,6 @@
          self.staticon.connect('activate', self.onLClick)
          self.staticon.connect('popup_menu', self.popup, self.menu)
          self.staticon.set_visible(True)
---- 1.3/setup.py
-+++ 1.2/setup.py
-@@ -4,7 +4,7 @@ from distutils.core import setup
- #from distutils.command.install_data import install_data
- 
- setup(name='pypoweroff',
--      version="1.3.1",
-+      version="1.2.4",
-       description='pyPowerOff package',
-       long_description = "Simple python powerroff program written on pyGTK",
-       author='Vitaly Tonkacheyev',
 --- 1.3/version.txt
 +++ 1.2/version.txt
 @@ -1 +1 @@
@@ -1036,12 +1025,19 @@
 \ В конце файла нет новой строки
 --- 1.3/win_setup.py
 +++ 1.2/win_setup.py
-@@ -0,0 +1,31 @@
+@@ -0,0 +1,40 @@
 +#!/usr/bin/env python
 +# setup.py
 +from distutils.core import setup
 +import py2exe
 +import glob
++
++def get_version ():
++      f = open("version.txt", "r")
++      f.seek(0)
++      lines = f.read()
++      f.close()
++      return "".join(lines).split("\n")[0]
 +
 +opts = {
 +    "py2exe": {
@@ -1049,10 +1045,12 @@
 +        }
 +    }
 +
++
++
 +setup(
 +    name = "pyPowerOff",
 +    description = ".Simple python powerroff program",
-+    version = "1.2.3",
++    version = get_version(),
 +    author="Vitaly Tonkacheyev",
 +    author_email="thetvg@gmail.com",
 +    windows = [
