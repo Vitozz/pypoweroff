@@ -32,6 +32,13 @@ class StatusIcc:
         if self.parent:
             self.parent.OnAbout(widget)
 
+    def onShutdown(self, widget, data=None):
+        if self.parent:
+            self.parent.OnShutdownNow(widget)
+
+    def onReboot(self, widget, data=None):
+        if self.parent:
+            self.parent.OnRebootNow(widget)
 
     def __init__(self, parent):
         """Status icon creation class"""
@@ -57,6 +64,18 @@ class StatusIcc:
         self.aboutItem = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_ABOUT,  None)
         self.aboutItem.connect('activate', self.onAbout)
         self.menu.append(self.aboutItem)
+        separator3 = Gtk.SeparatorMenuItem()
+        self.menu.append(separator3)
+        #Shutdown
+        self.shutdownItem = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_STOP,  None)
+        self.shutdownItem.connect('activate', self.onShutdown)
+        self.menu.append(self.shutdownItem)
+        self.shutdownItem.get_children()[0].set_label("Shutdown")
+        #Reboot
+        self.rebootItem = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_REFRESH,  None)
+        self.rebootItem.connect('activate', self.onReboot)
+        self.menu.append(self.rebootItem)
+        self.rebootItem.get_children()[0].set_label("Reboot")
         #Quit
         self.quitItem = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_QUIT,  None)
         self.quitItem.connect('activate', self.onQuit, self.staticon)

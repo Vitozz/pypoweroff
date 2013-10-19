@@ -10,7 +10,7 @@ from .pylocale import MyLocale
 
 MAX_TIME=int(24*3600)
 PROJECT="pypoweroff"
-VERSION="1.3.1"
+VERSION="1.3.2"
 
 if str(os.sys.platform) != "win32":
     from .linux_shutdown import Shutdowner
@@ -216,6 +216,18 @@ class mainFrame():
                 shutdown.Notify(self.loader.get(PROJECT, "images/poweroff.png"), self.language.main_dic.get('tmpsec') +":\n"+label2)
                 del shutdown
 
+    def OnShutdownNow(self, widget):
+        shutdown = Shutdowner()
+        shutdown.Notify(self.loader.get(PROJECT, "images/poweroff.png"), "System is shutting down...")
+        shutdown.Shutdown()
+        del shutdown
+        
+    def OnRebootNow(self, widget):
+        shutdown = Shutdowner()
+        shutdown.Notify(self.loader.get(PROJECT, "images/poweroff.png"), "System is rebooting...")
+        shutdown.Reboot()
+        del shutdown
+        
     def OnCancel(self, widget):
         self.Stop()
 
