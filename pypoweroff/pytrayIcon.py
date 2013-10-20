@@ -76,6 +76,8 @@ class StatusIcc:
         self.rebootItem.connect('activate', self.onReboot)
         self.menu.append(self.rebootItem)
         self.rebootItem.get_children()[0].set_label("Reboot")
+        separator4 = Gtk.SeparatorMenuItem()
+        self.menu.append(separator4)
         #Quit
         self.quitItem = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_QUIT,  None)
         self.quitItem.connect('activate', self.onQuit, self.staticon)
