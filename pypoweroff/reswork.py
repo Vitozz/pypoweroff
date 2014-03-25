@@ -10,11 +10,16 @@ class loadResFile:
         pass
 
     def get(self, project, fname):
-        plist = ("/usr/share", "/usr/local/share", str(os.environ['HOME']) + "/.local/share", str(os.getcwd())[:-len(project)])
+        cwd = str(os.getcwd())
+        plist = (cwd,cwd[:-len(project)],"/usr/share", "/usr/local/share", str(os.environ['HOME']) + "/.local/share")
         for path in plist:
             if path:
                 try:
-                    tmp_path = os.path.join(path, project, fname)
+                    tmp_path=""
+                    if cwd in path:
+                        tmp_path = os.path.join(path, fname)
+                    else:
+                        tmp_path = os.path.join(path, project, fname)
                     if os.path.exists(tmp_path):
                         return str(tmp_path)
                 except Exception as error:
